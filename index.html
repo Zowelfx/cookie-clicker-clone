@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Cookie Clicker</title>
+	<style>
+		body {
+			text-align: center;
+            background-image: url("wallpaper.jpg");
+		}
+		#cookie {
+			margin: 50px auto;
+			width: 200px;
+			height: 200px;
+			background-image: url('cookie.png');
+			background-size: contain;
+			background-repeat: no-repeat;
+			cursor: pointer;
+			
+		}
+		#cookie:active {
+			transform: scale(0.9);
+		}
+		#score {
+			font-size: 48px;
+			margin-bottom: 20px;
+            color: #e1e1e1;
+            font-family: 'Merriweather';
+		}
+		#passiveDisplay {
+			font-size: 24px;
+			margin-bottom: 10px;
+            color: #e1e1e1;
+            font-family: 'Merriweather';
+		}
+		.upgrade {
+			display: inline-block;
+			padding: 10px 20px;
+			font-size: 24px;
+			border-radius: 5px;
+			background-color: #FFA500;
+			color: #FFF;
+			cursor: pointer;
+			margin: 10px;
+		}
+		.upgrade.active {
+			background-color: #A9A9A9;
+			cursor: default;
+		}
+
+        .animate {
+			animation: bounce 0.5s;
+			animation-fill-mode: forwards;
+		}
+
+		@keyframes bounce {
+			0% { transform: scale(100%); }
+			15% { transform: scale(95%); }
+			75% { transform: scale(105%); }
+			100% { transform: scale(100%); }
+		}
+
+        #cookie-rain {
+  position: fixed;
+  top: 0;
+  left: -27%;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: -1;
+}
+
+.cookie {
+  position: absolute;
+  animation: fall linear infinite;
+  animation-duration: 4s;
+  animation-timing-function: linear;
+  animation-delay: calc(-1s * var(--delay));
+  transform-origin: center;
+  opacity: 0.5;
+  z-index: -1;
+}
+
+@keyframes fall {
+  0% {
+    transform: translateY(-400px) scale(0);
+  }
+  10% {
+    transform: translateY(-350px) scale(10%);
+  }
+  90% {
+    transform: translateY(80vh) scale(10%);
+  }
+  100% {
+    transform: translateY(100vh) scale(0);
+  }
+}
+
+
+
+	</style>
+</head>
+<body>
+	<div id="cookie" onclick="createCookieRain(15)"></div>
+	<div id="score">0</div>
+	<div id="passiveDisplay"></div>
+	<div id="upgrades">
+		<div id="upgrade1" class="upgrade">+1<br>Cost: 10</div>
+		<div id="upgrade2" class="upgrade">+5<br>Cost: 50</div>
+		<div id="upgrade3" class="upgrade">+20<br>Cost: 100</div>
+	</div>
+	
+    <div id="cookie-rain"></div>
+
+      
+	<script>
+		// Set initial values
+		let score = 0;
+		let passiveScore = 0;
+		let passiveCps = 0;
+		let upgrade1Cost = 10;
+		let upgrade2Cost = 50;
+		let upgrade3Cost = 100;
+		let upgrade1Active = false;
+		let upgrade2Active = false;
+		let upgrade3Active = false;
+
+		// Get elements
+		const cookie = document.getElementById('cookie');
+		const scoreDisplay = document.getElementById('score');
+		const passiveDisplay = document.getElementById('passiveDisplay');
+		const upgrade1Button = document.getElementById('upgrade1');
+		const upgrade2Button = document.getElementById('upgrade2');
+		const upgrade3Button = document.getElementById('upgrade3');
+
+		// Update functions
+		function updateScore() {
+			score += 0,5 + passiveCps;
+			scoreDisplay.textContent =`${score} cookies`;
+		}
+
+		function updatePassive() {
+			passiveScore += passiveCps;
+			score += passiveCps;
+			scoreDisplay.textContent = `${score} cookies`;
+			passiveDisplay.textContent = `Passive Earning: ${passiveCps} cookies/s`;
+		}
+
+		function updateUpgradeCosts() {
+			upgrade1Button.textContent = `+1\nCost: ${upgrade1Cost}`;
+			upgrade2Button.textContent = `+5\nCost: ${upgrade2Cost}`; 
+            upgrade3Button.textContent = `+20\nCost: ${upgrade3Cost}`;
+}
+	// Click cookie event
+	cookie.addEventListener('click', () => {
+		updateScore();
+		cookie.classList.add('bounce');
+		setTimeout(() => {
+			cookie.classList.remove('bounce');
+		}, 500);
+	});
+
+	// Passive earning loop
+	setInterval(updatePassive, 1000);
+
+	// Upgrade event listeners
+	upgrade1Button.addEventListener('click', () => {
+		if (score >= upgrade1Cost) {
+			score -= upgrade1Cost;
+			passiveCps += 1;
+			upgrade1Cost += 5;
+			updateUpgradeCosts();
+		}
+	});
+
+	upgrade2Button.addEventListener('click', () => {
+		if (score >= upgrade2Cost) {
+			score -= upgrade2Cost;
+			passiveCps += 5;
+			upgrade2Cost += 25;
+			updateUpgradeCosts();
+		}
+	});
+
+	upgrade3Button.addEventListener('click', () => {
+		if (score >= upgrade3Cost) {
+			score -= upgrade3Cost;
+			passiveCps += 20;
+			upgrade3Cost += 50;
+			updateUpgradeCosts();
+		}
+	});
+
+	        cookie.addEventListener('click', () => {
+			score++;
+			scoreDisplay.innerText = `${score} cookies`;
+			cookie.classList.remove('animate');
+			void cookie.offsetWidth; // force reflow to restart animation
+			cookie.classList.add('animate');
+		});
+        const cookieRain = document.getElementById("cookie-rain");
+
+function createCookie() {
+  const cookie = document.createElement("div");
+  cookie.className = "cookie";
+  cookie.style.left = `${Math.random() * 100}%`;
+  cookie.style.setProperty("--delay", Math.random() * 4);
+  cookie.innerHTML = '<img src="cookie.png" alt="Cookie">';
+  cookieRain.appendChild(cookie);
+  setTimeout(() => {
+    cookie.remove();
+  }, 5000);
+}
+
+setInterval(createCookie, 200);
+
+
+       </script>
